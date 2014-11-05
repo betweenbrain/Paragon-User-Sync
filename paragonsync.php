@@ -50,46 +50,72 @@ class PlgUserParagonsync extends JPlugin
 	 */
 	public function onUserAfterLogin($options)
 	{
+		// Get updated profile data from the API and insert it into the database
+		$member = $this->memberDetails($options['user']->username);
+		$userId = $options['user']->id;
 
-		$userId           = $options['user']->id;
-		$individualNumber = $this->app->input->get('surname', '');
+		// Import Joomla user helper
+		jimport('joomla.user.helper');
 
-		if ($userId)
+		$groups = JUserHelper::getUserGroups($userId);
+
+		if (strtolower($member->Status) != 's')
 		{
-			try
+			foreach ($this->memberFinancialDetails($member) as $detail)
 			{
-				// Clear existing profile entries
-				$query = $this->db->getQuery(true)
-					->delete($this->db->quoteName('#__user_profiles'))
-					->where($this->db->quoteName('user_id') . ' = ' . (int) $userId)
-					->where($this->db->quoteName('profile_key') . ' LIKE ' . $this->db->quote('profile.%'));
-				$this->db->setQuery($query);
-				$this->db->execute();
-
-				// Get updated profile data from the API and insert it into the database
-				$member = $this->memberDetails($options['user']->username);
-
-				$tuples = array();
-				$order  = 1;
-
-				foreach ($member as $k => $v)
+				if (!in_array($detail->FeeCode, $groups))
 				{
-					$tuples[] = '(' . $userId . ', ' . $this->db->quote('profile.' . $k) . ', ' . $this->db->quote(json_encode($v)) . ', ' . $order++ . ')';
+					JUserHelper::addUserToGroup($userId, $this->userGroups()[$detail->FeeCode]);
 				}
 
-				$this->db->setQuery('INSERT INTO #__user_profiles VALUES ' . implode(', ', $tuples));
-				$this->db->execute();
-
-			} catch (RuntimeException $e)
-			{
-				$this->_subject->setError($e->getMessage());
-
-				return false;
 			}
+
+			return true;
+		}
+
+		unset($groups['Registered']);
+
+		foreach ($groups as $group)
+		{
+			JUserHelper::removeUserFromGroup($userId, $group->id);
 		}
 
 		return true;
+	}
 
+	/**
+	 * Returns a list of all available user groups
+	 */
+	private function userGroups()
+	{
+		$query = $this->db->getQuery(true);
+
+		$query
+			->select($this->db->quoteName(array('id', 'title')))
+			->from($this->db->quoteName('#__usergroups'))
+			->order('id ASC');
+
+		$this->db->setQuery($query);
+
+		return $this->db->loadObjectList('title');
+	}
+
+	/**
+	 * Retrieves the user's financial details from the API
+	 *
+	 * @param $member
+	 *
+	 * @return mixed
+	 */
+	private function memberFinancialDetails($member)
+	{
+		$params = array(
+			'membSysConfig'    => $this->membSysConfig,
+			'MemberNumber'     => $member->MemberNumber,
+			'IndividualNumber' => $member->IndividualNumber
+		);
+
+		return $this->client->getMembersFinancialDetails($params)->getMembersFinancialDetailsResult;
 	}
 
 	/**
