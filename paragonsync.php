@@ -67,7 +67,7 @@ class PlgUserParagonsync extends JPlugin
 				$this->db->execute();
 
 				// Get updated profile data from the API and insert it into the database
-				$member = $this->getMemberDetails($options['user']->username, $individualNumber)->getMemberDetailsResult;
+				$member = $this->memberDetails($options['user']->username);
 
 				$tuples = array();
 				$order  = 1;
@@ -117,15 +117,21 @@ class PlgUserParagonsync extends JPlugin
 		return true;
 	}
 
-	private function getMemberDetails($memberNumber, $individualNumber)
+	/**
+	 * Retrieves the user details object from the API
+	 *
+	 * @param $username
+	 *
+	 * @return mixed
+	 */
+	private function memberDetails($username)
 	{
 		$params = array(
-			'membSysConfig'    => $this->membSysConfig,
-			'MemberNumber'     => '13140',
-			'IndividualNumber' => '1'
+			'membSysConfig' => $this->membSysConfig,
+			'Stats2'        => $username
 		);
 
-		return $this->client->getMemberDetails($params);
+		return $this->client->getMemberDetailsStats2($params)->getMemberDetailsStats2Result;
 	}
 
 }
