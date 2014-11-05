@@ -8,9 +8,15 @@
  * Copyright  Copyright (C) 2014 betweenbrain llc. All Rights Reserved.
  * License    GNU GPL v2 or later
  */
+
+/**
+ * Class PlgUserParagonsync
+ *
+ * @package  Paragon
+ * @since    1.0.0
+ */
 class PlgUserParagonsync extends JPlugin
 {
-
 	/**
 	 * Constructor.
 	 *
@@ -42,8 +48,8 @@ class PlgUserParagonsync extends JPlugin
 	/**
 	 * Update user profile from API after logging in
 	 *
-	 * @param $user
-	 * @param $options
+	 * @param  $user
+	 * @param  $options
 	 *
 	 * @return bool
 	 *
@@ -57,15 +63,17 @@ class PlgUserParagonsync extends JPlugin
 		// Import Joomla user helper
 		jimport('joomla.user.helper');
 
-		$groups = JUserHelper::getUserGroups($userId);
+		$assignedGroups  = JUserHelper::getUserGroups($userId);
+		$availableGroups = $this->getAllUserGroups();
 
+		// Assign groups if user is not suspended
 		if (strtolower($member->Status) != 's')
 		{
 			foreach ($this->memberFinancialDetails($member) as $detail)
 			{
-				if (!in_array($detail->FeeCode, $groups))
+				if (!in_array($availableGroups[$detail->FeeCode]->id, $assignedGroups))
 				{
-					JUserHelper::addUserToGroup($userId, $this->userGroups()[$detail->FeeCode]);
+					JUserHelper::addUserToGroup($userId, $availableGroups[$detail->FeeCode]->id);
 				}
 
 			}
@@ -73,11 +81,12 @@ class PlgUserParagonsync extends JPlugin
 			return true;
 		}
 
-		unset($groups['Registered']);
+		// Remove all groups, except Registered, if user is suspended
+		unset($assignedGroups[$availableGroups['Registered']->id]);
 
-		foreach ($groups as $group)
+		foreach ($assignedGroups as $group)
 		{
-			JUserHelper::removeUserFromGroup($userId, $group->id);
+			JUserHelper::removeUserFromGroup($userId, $group);
 		}
 
 		return true;
@@ -85,8 +94,10 @@ class PlgUserParagonsync extends JPlugin
 
 	/**
 	 * Returns a list of all available user groups
+	 *
+	 * @return mixed
 	 */
-	private function userGroups()
+	private function getAllUserGroups()
 	{
 		$query = $this->db->getQuery(true);
 
@@ -115,7 +126,7 @@ class PlgUserParagonsync extends JPlugin
 			'IndividualNumber' => $member->IndividualNumber
 		);
 
-		return $this->client->getMembersFinancialDetails($params)->getMembersFinancialDetailsResult;
+		return $this->client->getMembersFinancialDetails($params)->getMembersFinancialDetailsResult->MembersFinancialDetails;
 	}
 
 	/**
