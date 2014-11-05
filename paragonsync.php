@@ -93,31 +93,6 @@ class PlgUserParagonsync extends JPlugin
 	}
 
 	/**
-	 * Send data back to Paragon when the user saves their profile
-	 *
-	 * @param $data
-	 * @param $isNew
-	 * @param $result
-	 * @param $error
-	 *
-	 * @return bool
-	 */
-	public function onUserAfterSave($data, $isNew, $result, $error)
-	{
-		$userId = JArrayHelper::getValue($data, 'id', 0, 'int');
-
-		if ($userId && $result && isset($data['profile']) && (count($data['profile'])))
-		{
-			foreach ($data['profile'] as $k => $v)
-			{
-
-			}
-		}
-
-		return true;
-	}
-
-	/**
 	 * Retrieves the user details object from the API
 	 *
 	 * @param $username
