@@ -71,25 +71,52 @@ class PlgUserParagonsync extends JPlugin
 		{
 			foreach ($this->memberFinancialDetails($member) as $detail)
 			{
+				if (!array_key_exists($detail->FeeCode, $availableGroups))
+				{
+					$this->createGroup($detail->FeeCode);
+
+					// Get the available groups again to ensure list is updated
+					$availableGroups = $this->getAllUserGroups();
+				}
+
 				if (!in_array($availableGroups[$detail->FeeCode]->id, $assignedGroups))
 				{
 					JUserHelper::addUserToGroup($userId, $availableGroups[$detail->FeeCode]->id);
 				}
-
 			}
 
 			return true;
 		}
 
-		// Remove all groups, except Registered, if user is suspended
-		unset($assignedGroups[$availableGroups['Registered']->id]);
-
-		foreach ($assignedGroups as $group)
+		// Remove user from all groups associated with their Fee Codes
+		foreach ($this->memberFinancialDetails($member) as $detail)
 		{
-			JUserHelper::removeUserFromGroup($userId, $group);
+			if (in_array($availableGroups[$detail->FeeCode]->id, $assignedGroups))
+			{
+				JUserHelper::removeUserFromGroup($userId, $availableGroups[$detail->FeeCode]->id);
+			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Method to create a user group
+	 *
+	 * @param     $title
+	 * @param int $parent
+	 */
+	private function createGroup($title, $parent = 1)
+	{
+		jimport('joomla.database.table');
+		jimport('joomla.database.table.table');
+
+		$table = JTable::getInstance('usergroup');
+
+		$table->parent_id = $parent;
+		$table->title     = $title;
+		$table->check();
+		$table->store();
 	}
 
 	/**
