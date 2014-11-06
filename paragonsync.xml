@@ -15,4 +15,39 @@
 		<folder>language</folder>
 	</files>
 
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+				<field name="client"
+				       type="text"
+				       default="http://178.251.168.55:8013/ParagonMembershipWeb.svc?wsdl"
+				       label="PLG_AUTHENTICATION_PARAGONSYNC_CLIENT_LABEL"
+				       description="PLG_AUTHENTICATION_PARAGONSYNC_CLIENT_DESC" />
+				<field name="integratedSecurity"
+				       type="list"
+				       default="1"
+				       label="PLG_AUTHENTICATION_PARAGONSYNC_INTEGRATED_SECURITY_LABEL"
+				       description="PLG_AUTHENTICATION_PARAGONSYNC_INTEGRATED_SECURITY_DESC">
+					<option value="1">PLG_AUTHENTICATION_PARAGONSYNC_TRUE</option>
+					<option value="0">PLG_AUTHENTICATION_PARAGONSYNC_FALSE</option>
+				</field>
+				<field name="dbPath"
+				       type="text"
+				       default="c:\\sqldata\\"
+				       label="PLG_AUTHENTICATION_PARAGONSYNC_DBPATH_LABEL"
+				       description="PLG_AUTHENTICATION_PARAGONSYNC_DBPATH_DESC" />
+				<field name="dbName"
+				       type="text"
+				       default="MembTrain"
+				       label="PLG_AUTHENTICATION_PARAGONSYNC_DBNAME_LABEL"
+				       description="PLG_AUTHENTICATION_PARAGONSYNC_DBNAME_DESC" />
+				<field name="dbServer"
+				       type="text"
+				       default="ROSLSQL02\SqlExpress"
+				       label="PLG_AUTHENTICATION_PARAGONSYNC_DBSERVER_LABEL"
+				       description="PLG_AUTHENTICATION_PARAGONSYNC_DBSERVER_DESC" />
+			</fieldset>
+		</fields>
+	</config>
+
 </extension>

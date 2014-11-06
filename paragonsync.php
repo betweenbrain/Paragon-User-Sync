@@ -28,19 +28,21 @@ class PlgUserParagonsync extends JPlugin
 	public function __construct(&$subject, $config)
 	{
 		parent::__construct($subject, $config);
+
 		$this->app           = JFactory::getApplication();
 		$this->db            = JFactory::getDbo();
-		$this->client        = new SoapClient('http://178.251.168.55:8013/ParagonMembershipWeb.svc?wsdl');
+		$this->client        = new SoapClient($this->params->get('client'));
 		$this->filter        = new JFilterInput;
 		$this->membSysConfig = array(
 			'membDBConfig' => array(
-				'IntegratedSecurity' => 'true',
-				'MembDbDataPath'     => 'c:\\sqldata\\',
-				'MembDbDatabaseName' => 'MembTrain',
-				'MembDbServer'       => 'ROSLSQL02\SqlExpress'
+				'IntegratedSecurity' => $this->params->get('integratedSecurity'),
+				'MembDbDataPath'     => $this->params->get('dbPath'),
+				'MembDbDatabaseName' => $this->params->get('dbName'),
+				'MembDbServer'       => $this->params->get('dbServer')
 			)
 		);
 		$this->user          = JFactory::getUser();
+
 		// Load the language file on instantiation
 		$this->loadLanguage();
 	}
