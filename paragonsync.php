@@ -155,7 +155,7 @@ class PlgUserParagonsync extends JPlugin
 			'IndividualNumber' => $member->IndividualNumber
 		);
 
-		return $this->client->getMembersFinancialDetails($params)->getMembersFinancialDetailsResult;
+		return $this->client->getMembersFinancialDetails($params)->getMembersFinancialDetailsResult->MembersFinancialDetails;
 	}
 
 	/**
