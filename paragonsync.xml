@@ -3,12 +3,12 @@
 	<author>Matt Thomas</author>
 	<authorEmail>matt@betweenbrain.com</authorEmail>
 	<authorUrl>http://betweenbrain.com</authorUrl>
-	<copyright>(C) 2014 betweenbrain llc. All rights reserved.</copyright>
-	<creationDate>November 6, 2014</creationDate>
+	<copyright>(C) betweenbrain llc. All rights reserved.</copyright>
+	<creationDate>February 5, 2015</creationDate>
 	<description>PLG_USER_PARAGONSYNC_DESC</description>
 	<license>GNU/GPL v2 or later</license>
 	<name>plg_user_paragonsync</name>
-	<version>1.1.1</version>
+	<version>1.1.2</version>
 
 	<files>
 		<filename plugin="paragonsync">paragonsync.php</filename>
