@@ -90,7 +90,7 @@ class PlgUserParagonsync extends JPlugin
 			return true;
 		}
 
-		// Remove user from all groups associated with their Fee Codes
+		// Remove suspended user from all groups associated with their Fee Codes
 		foreach ($this->memberFinancialDetails($member) as $detail)
 		{
 			if (in_array($availableGroups[$detail->FeeCode]->id, $assignedGroups))
