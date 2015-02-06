@@ -99,6 +99,9 @@ class PlgUserParagonsync extends JPlugin
 			}
 		}
 
+		// Update user
+		$this->updateUser($userId, $member);
+
 		return true;
 	}
 
@@ -173,6 +176,42 @@ class PlgUserParagonsync extends JPlugin
 		);
 
 		return $this->client->getMemberDetailsStats2($params)->getMemberDetailsStats2Result;
+	}
+
+	/**
+	 * Updates user details
+	 *
+	 * @param $userId
+	 * @param $data
+	 *
+	 * @return bool
+	 */
+	private function updateUser($userId, $member) {
+
+		$user = new JUser($userId);
+
+		$data = array(
+			"name"  => trim($member->Forename) . ' ' . trim($member->Surname),
+			"email" => trim($member->Email)
+		);
+
+		// Bind the data.
+		if (!$user->bind($data)) {
+			$this->setError($user->getError());
+
+			return false;
+		}
+
+		$user->groups = null;
+
+		// Store the data.
+		if (!$user->save()) {
+			$this->setError($user->getError());
+
+			return false;
+		}
+
+		return true;
 	}
 
 }
