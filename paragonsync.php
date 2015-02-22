@@ -106,18 +106,22 @@ class PlgUserParagonsync extends JPlugin
 					JUserHelper::addUserToGroup($userId, $availableGroups[$detail->FeeCode]->id);
 				}
 			}
-
-			return true;
 		}
 
 		// Remove suspended user from all groups associated with their Fee Codes
-		foreach ($this->memberFinancialDetails($member) as $detail)
+		if (strtolower($member->Status) == 's')
 		{
-			if (in_array($availableGroups[$detail->FeeCode]->id, $assignedGroups))
+			foreach ($this->memberFinancialDetails($member) as $detail)
 			{
-				JUserHelper::removeUserFromGroup($userId, $availableGroups[$detail->FeeCode]->id);
+				if (in_array($availableGroups[$detail->FeeCode]->id, $assignedGroups))
+				{
+					JUserHelper::removeUserFromGroup($userId, $availableGroups[$detail->FeeCode]->id);
+				}
 			}
 		}
+
+		// Update user
+		$this->updateUser($userId, $member);
 
 		return true;
 
