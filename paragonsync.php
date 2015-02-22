@@ -62,11 +62,19 @@ class PlgUserParagonsync extends JPlugin
 		$member = $this->memberDetails($options['user']->username);
 		$userId = $options['user']->id;
 
+		// add the hashed password to the joomla db if responseType is Paragon - added by Waseem Sadiq 17.02.2015
+		$this->savePassword($options);
+
 		// Import Joomla user helper
 		jimport('joomla.user.helper');
 
 		$assignedGroups  = JUserHelper::getUserGroups($userId);
 		$availableGroups = $this->getAllUserGroups();
+
+		//add sha1 password to the session, to be used in com_wrapper override. Luciano jan-13-2015
+		$session =& JFactory::getSession();
+		$session->set("sha1pass", sha1($_POST['password']));
+		$session->set("MemberRef", $options['user']->username);
 
 		// Assign groups if user is not suspended
 		if (strtolower($member->Status) != 's')
@@ -103,6 +111,15 @@ class PlgUserParagonsync extends JPlugin
 		$this->updateUser($userId, $member);
 
 		return true;
+
+		// Create Mijoshop customer from user if one does not already exist - added by Waseem Sadiq 17.02.2015
+		if (MijoShop::get('user')->getOCustomerById($userId) === null)
+		{
+			MijoShop::get('user')->createOAccountFromJ($options['user']);
+
+			return true;
+		}
+
 	}
 
 	/**
@@ -179,6 +196,41 @@ class PlgUserParagonsync extends JPlugin
 	}
 
 	/**
+	 * Adds the password to the Joomla user
+	 *
+	 * @return mixed
+	 */
+	private function savePassword($options)
+	{
+		$mainframe    = JFactory::getApplication();
+		$responseType = $options['responseType'];
+
+		if ($mainframe->isAdmin())
+		{
+			return true;
+		}
+
+		elseif ($responseType == 'Paragon')
+		{
+			//hash Password
+			$hashedPass = JUserHelper::hashPassword($_POST['password']);
+			// username
+			$username = $options['user']->username;
+			//save Password
+			$query = $this->db->getQuery(true);
+			$query
+				->update('#__users')
+				->set("password=" . $this->db->quote($hashedPass))
+				->where("username=" . $username);
+
+			$this->db->setQuery($query);
+			$result = $this->db->execute();
+		}
+
+		return true;
+	}
+
+	/**
 	 * Updates user details
 	 *
 	 * @param $userId
@@ -186,7 +238,8 @@ class PlgUserParagonsync extends JPlugin
 	 *
 	 * @return bool
 	 */
-	private function updateUser($userId, $member) {
+	private function updateUser($userId, $member)
+	{
 
 		$user = new JUser($userId);
 
@@ -196,7 +249,8 @@ class PlgUserParagonsync extends JPlugin
 		);
 
 		// Bind the data.
-		if (!$user->bind($data)) {
+		if (!$user->bind($data))
+		{
 			$this->setError($user->getError());
 
 			return false;
@@ -205,7 +259,8 @@ class PlgUserParagonsync extends JPlugin
 		$user->groups = null;
 
 		// Store the data.
-		if (!$user->save()) {
+		if (!$user->save())
+		{
 			$this->setError($user->getError());
 
 			return false;
