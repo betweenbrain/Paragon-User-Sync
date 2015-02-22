@@ -4,11 +4,11 @@
 	<authorEmail>matt@betweenbrain.com</authorEmail>
 	<authorUrl>http://betweenbrain.com</authorUrl>
 	<copyright>(C) betweenbrain llc. All rights reserved.</copyright>
-	<creationDate>February 6, 2015</creationDate>
+	<creationDate>February 22, 2015</creationDate>
 	<description>PLG_USER_PARAGONSYNC_DESC</description>
 	<license>GNU/GPL v2 or later</license>
 	<name>plg_user_paragonsync</name>
-	<version>1.1.5</version>
+	<version>1.1.6</version>
 
 	<files>
 		<filename plugin="paragonsync">paragonsync.php</filename>
