@@ -79,7 +79,19 @@ class PlgUserParagonsync extends JPlugin
 		// Assign groups if user is not suspended
 		if (strtolower($member->Status) != 's')
 		{
-			foreach ($this->memberFinancialDetails($member) as $detail)
+
+			// Force memberDetails to always be an array as the API doesn't return consistent data
+			if (is_array($this->memberFinancialDetails($member)))
+			{
+				$memberFinancialDetails = $this->memberFinancialDetails($member);
+			}
+
+			if (!is_array($this->memberFinancialDetails($member)))
+			{
+				$memberFinancialDetails[] = $this->memberFinancialDetails($member);
+			}
+
+			foreach ($memberFinancialDetails as $detail)
 			{
 				if (!array_key_exists($detail->FeeCode, $availableGroups))
 				{
@@ -106,9 +118,6 @@ class PlgUserParagonsync extends JPlugin
 				JUserHelper::removeUserFromGroup($userId, $availableGroups[$detail->FeeCode]->id);
 			}
 		}
-
-		// Update user
-		$this->updateUser($userId, $member);
 
 		return true;
 
