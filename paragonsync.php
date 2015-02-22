@@ -123,16 +123,13 @@ class PlgUserParagonsync extends JPlugin
 		// Update user
 		$this->updateUser($userId, $member);
 
-		return true;
-
 		// Create Mijoshop customer from user if one does not already exist - added by Waseem Sadiq 17.02.2015
 		if (MijoShop::get('user')->getOCustomerById($userId) === null)
 		{
 			MijoShop::get('user')->createOAccountFromJ($options['user']);
-
-			return true;
 		}
 
+		return true;
 	}
 
 	/**
